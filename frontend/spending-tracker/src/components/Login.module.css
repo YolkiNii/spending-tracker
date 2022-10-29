@@ -9,6 +9,10 @@
     padding: 1vw;
 }
 
+.container > *:not(:last-child) {
+    margin-bottom: 10px;
+}
+
 .formContainer {
     display: flex;
     flex-direction: column;
@@ -51,5 +55,8 @@
     color: #069;
     text-decoration: underline;
     cursor: pointer;
-    margin-top: 10px;
+}
+
+.error {
+    background-color: lightcoral;
 }

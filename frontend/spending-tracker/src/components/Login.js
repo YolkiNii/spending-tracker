@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import styles from './Login.module.css'
+import baseAPI from '../api/base';
 
 const MyInputField = ({label, type, value, handleChange}) => {
   return (
@@ -21,7 +22,9 @@ const Login = () => {
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [creatingAccount, setCreatingAccount] = useState(false);
+  const [errorMsg, setErrorMsg] = useState('');
 
+  // blank all fields when switching
   useEffect(() => {
     setUsername('');
     setPassword('');
@@ -30,25 +33,39 @@ const Login = () => {
     setLastName('');
   }, [creatingAccount]);
 
+  // remove error message when user re inputs
+  useEffect(() => {
+    setErrorMsg('');
+  }, [username, password, email, firstName, lastName]);
+
   const handleSubmit = e => {
     e.preventDefault();
 
-    console.log('In handleSubmit');
-
     if (creatingAccount) {
-      console.log({
-        'firstName': firstName,
-        'lastName': lastName,
-        'email': email,
-        'username': username,
-        'password': password
-      });
+      const newUser = {
+        email,
+        firstName,
+        lastName,
+        username,
+        password
+      }
+
+      console.log(newUser);
+
+      // send new account info
+      
+      // check if user is valid
     }
+    // attempt login
     else {
-      console.log({
-        'username': username,
-        'password': password
-      });
+      const user = {
+        username,
+        password
+      }
+
+      console.log(user);
+
+      //
     }
   }
 
@@ -111,6 +128,7 @@ const Login = () => {
 
   return (
     <div className={styles.container}>
+      {errorMsg ? <p className={styles.error}>{errorMsg}</p> : null}
       <form className={styles.formContainer} onSubmit={handleSubmit}>
         {form}
       </form>
