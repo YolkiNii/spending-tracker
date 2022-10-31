@@ -23,6 +23,7 @@ app.use(express.json());
 
 // routes
 app.use('/register', require('./routes/api/registerRouter'));
+app.use('/auth', require('./routes/api/authRouter'));
 
 app.listen(PORT, (err) => {
     if (err)

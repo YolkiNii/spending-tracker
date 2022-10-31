@@ -47,7 +47,7 @@ const handleNewUser = async (req, res) => {
             JSON.stringify(usersDB.users)
         );
 
-        res.status(200).json({'success': `User: ${username} added`});
+        res.status(201).json({'success': `User: ${username} added`});
     } catch (err) {
         res.status(500).json({'message': err.message});
     }
