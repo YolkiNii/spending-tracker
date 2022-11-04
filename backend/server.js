@@ -1,29 +1,32 @@
 const express = require('express');
 const cors = require('cors');
+const cookieParser = require('cookie-parser');
 
 const app = express();
 const PORT = 3500;
 
-const whitelist = ['https://localhost:3000', 'https://localhost:3500'];
-const corsOptions = {
-    origin: (origin, callback) => {
-        if (whitelist.indexOf(origin) !== -1 || !origin)
-            callback(null, true);
-        else
-            callback(new Error('Not allowed by CORS'));
-    },
-    optionsSuccessStatus: 200
-}
+// Handle options credentials check - before CORS!
+// and fetch cookies credentials requirement
+app.use(require('./middleware/credentials'));
 
-app.use(cors(corsOptions));
+// Cross Origin Resource Sharing
+app.use(cors(require('./config/corsOptions')));
 
+// built-in middleware to handle urlencoded form data
 app.use(express.urlencoded({extended: false}));
 
+// built-in middleware for json
 app.use(express.json());
+
+// middleware for cookies
+app.use(cookieParser());
 
 // routes
 app.use('/register', require('./routes/api/registerRouter'));
 app.use('/auth', require('./routes/api/authRouter'));
+app.use('/refresh', require('./routes/api/refreshTokenRouter'));
+app.use('/logout', require('./routes/api/logoutRouter'));
+
 
 app.listen(PORT, (err) => {
     if (err)
