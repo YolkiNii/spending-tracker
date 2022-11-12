@@ -1,6 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const cookieParser = require('cookie-parser');
+const db = require('./config/db');
 
 const app = express();
 const PORT = 3500;
@@ -23,14 +24,21 @@ app.use(cookieParser());
 
 // routes
 app.use('/register', require('./routes/api/registerRouter'));
-app.use('/auth', require('./routes/api/authRouter'));
-app.use('/refresh', require('./routes/api/refreshTokenRouter'));
-app.use('/logout', require('./routes/api/logoutRouter'));
+// app.use('/auth', require('./routes/api/authRouter'));
+// app.use('/refresh', require('./routes/api/refreshTokenRouter'));
+// app.use('/logout', require('./routes/api/logoutRouter'));
 
-
-app.listen(PORT, (err) => {
-    if (err)
+// connect to DB
+db.connect((err) => {
+    if (err) 
         console.log(err);
 
-    console.log(`Server now listening on port: ${PORT}`);
+    console.log('Connected to DB');
+    
+    app.listen(PORT, (err) => {
+        if (err)
+            return console.log(err);
+    
+        console.log(`Server now listening on port: ${PORT}`);
+    });
 });
