@@ -4,12 +4,16 @@ const db = require('../config/db');
 class Users {
     static async findUserByUsername (username) {
         return new Promise((resolve, reject) => {
-            const sql = "SELECT username FROM users WHERE username = " + mysql.escape(username);
+            const sql = "SELECT * FROM users WHERE username = " + mysql.escape(username);
             db.query(sql, (err, result) => {
-                if (err) 
-                    reject(err)
-                
-                resolve(result);
+                const user = JSON.parse(JSON.stringify(result));
+                if (err)
+                    reject(err);
+
+                if (user.length === 0)
+                    resolve(null);
+
+                resolve(user[0]);
             });
         })
     }
@@ -25,6 +29,18 @@ class Users {
                 resolve();
             });
         })
+    }
+
+    static async setUserRefreshToken(username, refreshToken) {
+        return new Promise((resolve, reject) => {
+            const sql = 'UPDATE users SET refresh_token = ' + mysql.escape(refreshToken) + ' WHERE username =' + mysql.escape(username);
+            db.query(sql, (err) => {
+                if (err)
+                    reject(err);
+                
+                resolve();
+            })
+        });
     }
 }
 

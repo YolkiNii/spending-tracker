@@ -17,12 +17,11 @@ const handleNewUser = async (req, res) => {
     if (!email || !firstName || !lastName || !username || !password)
         return res.sendStatus(400).json({'message': 'All fields need to be filled.'});
 
-    
     try {
         // check if user already exists
         const foundUser =  await Users.findUserByUsername(username);
 
-        if (Object.keys(foundUser).length !== 0)
+        if (foundUser)
             return res.sendStatus(409);
 
         // hash password and record user
