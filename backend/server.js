@@ -25,7 +25,7 @@ app.use(cookieParser());
 // routes
 app.use('/register', require('./routes/api/registerRouter'));
 app.use('/auth', require('./routes/api/authRouter'));
-// app.use('/refresh', require('./routes/api/refreshTokenRouter'));
+app.use('/refresh', require('./routes/api/refreshTokenRouter'));
 // app.use('/logout', require('./routes/api/logoutRouter'));
 
 // connect to DB

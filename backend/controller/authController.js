@@ -31,8 +31,8 @@ const handleLogin = async (req, res) => {
         );
 
         // save the refresh token with the current user
-        Users.setUserRefreshToken(foundUser.username, refreshToken);
-        res.cookie('jwt', refreshToken, {httpOnly: true, sameSite: 'None', secure: true, maxAge: 24 * 60 * 60 * 1000});
+        await Users.setUserRefreshToken(foundUser.username, refreshToken);
+        res.cookie('jwt', refreshToken, {httpOnly: true, sameSite: 'None', maxAge: 24 * 60 * 60 * 1000});
         res.json({accessToken});
     }
     else
