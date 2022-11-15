@@ -34,6 +34,18 @@ class Users {
         });
     }
 
+    static async removeUserRefreshToken(refreshToken) {
+        return new Promise((resolve, reject) => {
+            const sql = "UPDATE users SET refresh_token = NULL WHERE refresh_token = " + mysql.escape(refreshToken);
+            db.query(sql, (err) => {
+                if (err)
+                    reject(err);
+
+                resolve();
+            });
+        });
+    }
+
     static async addUser(firstName, lastName, email, username, hashPassword) {
         return new Promise((resolve, reject) => {
             const sql = "INSERT INTO users (first_name, last_name, email, username, hash_password) VALUES ?"
@@ -44,7 +56,7 @@ class Users {
                 
                 resolve();
             });
-        })
+        });
     }
 
     static async setUserRefreshToken(username, refreshToken) {
@@ -56,7 +68,7 @@ class Users {
                     reject(err);
                 
                 resolve();
-            })
+            });
         });
     }
 }

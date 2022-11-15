@@ -1,6 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const cookieParser = require('cookie-parser');
+const verifyJWT = require('./middleware/verifyJWT');
 const db = require('./config/db');
 
 const app = express();
@@ -26,7 +27,10 @@ app.use(cookieParser());
 app.use('/register', require('./routes/api/registerRouter'));
 app.use('/auth', require('./routes/api/authRouter'));
 app.use('/refresh', require('./routes/api/refreshTokenRouter'));
-// app.use('/logout', require('./routes/api/logoutRouter'));
+app.use('/logout', require('./routes/api/logoutRouter'));
+
+app.use(verifyJWT);
+app.use('/users', require('./routes/api/usersRouter'));
 
 // connect to DB
 db.connect((err) => {
