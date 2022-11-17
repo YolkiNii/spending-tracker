@@ -1,8 +1,10 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useContext } from 'react';
+import AuthContext from '../context/AuthProvider';
 import styles from './Login.module.css'
 import baseAPI from '../api/base';
 
 const REGISTER_URL = '/register';
+const LOGIN_URL = '/auth';
 
 const MyInputField = ({label, type, value, handleChange}) => {
   return (
@@ -18,6 +20,7 @@ const MyInputField = ({label, type, value, handleChange}) => {
 }
 
 const Login = () => {
+  const { setAuth } = useContext(AuthContext);
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [email, setEmail] = useState('')
@@ -61,22 +64,24 @@ const Login = () => {
             headers: {'Content-Type': 'application/json'},
             withCredentials: true
           }
-        )
+        );
         console.log(response.data);
         console.log(response.accessToken);
         console.log(JSON.stringify(response));
+        setUsername('');
+        setPassword('');
+        setEmail('');
+        setFirstName('');
+        setLastName('');
         setSuccess(true);
       } 
       catch (err) {
-        if (!err?.response) {
+        if (!err?.response)
           setErrorMsg('No Server Response');
-        } 
-        else if (err.response?.status === 409) {
+        else if (err.response?.status === 409)
           setErrorMsg('Username Taken');
-        }
-        else {
+        else
           setErrorMsg('Registration Failed');
-        }
       }
     }
     // attempt login
@@ -86,9 +91,31 @@ const Login = () => {
         password
       }
 
-      console.log(user);
+      try {
+        const response = await baseAPI.post(LOGIN_URL,
+          JSON.stringify(user),
+          {
+            headers: {'Content-Type': 'application/json'},
+            withCredentials: true
+          }
+        );
 
-      //
+        const accessToken = response?.data?.accessToken;
+        setAuth({...user, accessToken});
+        setUsername('');
+        setPassword('');
+        setSuccess(true);
+      }
+      catch (err) {
+        if (!err?.response)
+          setErrorMsg('No Server Response');
+        else if (err.response?.status === 400)
+          setErrorMsg('Missing Username or Password');
+        else if (err.response?.status === 401)
+          setErrorMsg('Unauthorized');
+        else
+          setErrorMsg('Login Failed');
+      }
     }
   }
 
