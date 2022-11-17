@@ -2,6 +2,8 @@ import { useEffect, useState } from 'react';
 import styles from './Login.module.css'
 import baseAPI from '../api/base';
 
+const REGISTER_URL = '/register';
+
 const MyInputField = ({label, type, value, handleChange}) => {
   return (
     <>
@@ -23,6 +25,7 @@ const Login = () => {
   const [lastName, setLastName] = useState('');
   const [creatingAccount, setCreatingAccount] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
+  const [success, setSuccess] = useState(false);
 
   // blank all fields when switching
   useEffect(() => {
@@ -38,7 +41,7 @@ const Login = () => {
     setErrorMsg('');
   }, [username, password, email, firstName, lastName]);
 
-  const handleSubmit = e => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     if (creatingAccount) {
@@ -50,11 +53,31 @@ const Login = () => {
         password
       }
 
-      console.log(newUser);
-
       // send new account info
-      
-      // check if user is valid
+      try {
+        const response = await baseAPI.post(REGISTER_URL, 
+          JSON.stringify(newUser),
+          {
+            headers: {'Content-Type': 'application/json'},
+            withCredentials: true
+          }
+        )
+        console.log(response.data);
+        console.log(response.accessToken);
+        console.log(JSON.stringify(response));
+        setSuccess(true);
+      } 
+      catch (err) {
+        if (!err?.response) {
+          setErrorMsg('No Server Response');
+        } 
+        else if (err.response?.status === 409) {
+          setErrorMsg('Username Taken');
+        }
+        else {
+          setErrorMsg('Registration Failed');
+        }
+      }
     }
     // attempt login
     else {
@@ -127,15 +150,21 @@ const Login = () => {
   const form = creatingAccount ? createAccountForm : userForm;
 
   return (
-    <div className={styles.container}>
-      {errorMsg ? <p className={styles.error}>{errorMsg}</p> : null}
-      <form className={styles.formContainer} onSubmit={handleSubmit}>
-        {form}
-      </form>
-      {creatingAccount ? <button className={styles.btnlink} type='button' onClick={() => setCreatingAccount(false)}>Login</button> :
-        <button className={styles.btnlink} type='button' onClick={() => setCreatingAccount(true)}>Create an account</button>}
-    </div>
-  )
+    <>
+      {success ? (
+        <h1>Success</h1>
+      ) : (
+      <div className={styles.container}>
+        {errorMsg ? <p className={styles.error}>{errorMsg}</p> : null}
+        <form className={styles.formContainer} onSubmit={handleSubmit}>
+          {form}
+        </form>
+        {creatingAccount ? <button className={styles.btnlink} type='button' onClick={() => setCreatingAccount(false)}>Login</button> :
+          <button className={styles.btnlink} type='button' onClick={() => setCreatingAccount(true)}>Create an account</button>}
+      </div>
+      )}
+    </>
+  );
 }
 
 export default Login;
