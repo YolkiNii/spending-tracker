@@ -7,9 +7,9 @@ const Home = () => {
     return (
         <>
             {auth?.username ? (
-            <UserHome />
+                <UserHome />
             ) : (
-            <Login />
+                <Login />
             )}
         </>
     );

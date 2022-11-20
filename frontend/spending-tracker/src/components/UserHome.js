@@ -24,7 +24,7 @@ const UserHome = () => {
             catch (err) {
                 console.error(err);
                 // Token is not valid
-                if (err?.response?.status == 403)
+                if (err?.response?.status === 403)
                     setAuth({});
             }
         }

@@ -7,11 +7,12 @@ const useRefreshToken = () => {
     const {setAuth} = useAuth();
     
     const refresh = async () => {
+        // get a new access token with user's refresh token in cookie
         const response = await baseAPI.get(REFRESH_URL, {
             withCredentials: true
         });
         setAuth(prev => {
-            return {...prev, accessToken: response.data.accessToken}
+            return {...prev, username: response.data.username, accessToken: response.data.accessToken}
         });
         return response.data.accessToken;
     }

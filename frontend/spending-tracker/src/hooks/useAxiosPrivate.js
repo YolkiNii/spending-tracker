@@ -8,7 +8,7 @@ const useAxiosPrivate = () => {
     const {auth} = useAuth();
 
     useEffect(() => {
-        console.log('In AxiosPrivate: ', auth);
+        // makes sure when requesting private data, it attaches the access token to requests
         const requestIntercept = privateBaseAPI.interceptors.request.use(
             config => {
                 // check if token is there
@@ -19,6 +19,7 @@ const useAxiosPrivate = () => {
             }, (error) => Promise.reject(error)
         );
 
+        // checks if response was given via a valid access token, otherwise resend the request after refreshing access token
         const responseIntercept = privateBaseAPI.interceptors.response.use(
             // response has no issue
             response => response,

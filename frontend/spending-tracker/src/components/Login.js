@@ -1,7 +1,7 @@
-import { useEffect, useState, useContext } from 'react';
+import { useEffect, useState } from 'react';
 import styles from './Login.module.css'
 import baseAPI from '../api/base';
-import AuthContext from '../context/AuthProvider';
+import useAuth from '../hooks/useAuth';
 
 const REGISTER_URL = '/register';
 const LOGIN_URL = '/auth';
@@ -20,7 +20,7 @@ const MyInputField = ({label, type, value, handleChange}) => {
 }
 
 const Login = () => {
-  const {setAuth} = useContext(AuthContext);
+  const {setAuth} = useAuth();
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [email, setEmail] = useState('')
