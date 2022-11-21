@@ -31,6 +31,7 @@ app.use('/logout', require('./routes/api/logoutRouter'));
 
 app.use(verifyJWT);
 app.use('/users', require('./routes/api/usersRouter'));
+app.use('/spendings', require('./routes/api/spendingsRouter'));
 
 // connect to DB
 db.connect((err) => {
