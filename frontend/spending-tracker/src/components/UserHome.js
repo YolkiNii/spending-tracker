@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import useAxiosPrivate from "../hooks/useAxiosPrivate";
 import useAuth from "../hooks/useAuth";
 import useLogout from "../hooks/useLogout";
+import Spendings from "./Spendings";
 
 const USERS_URL = '/users';
 
@@ -45,6 +46,7 @@ const UserHome = () => {
             <p>First Name: {user.firstName}</p>
             <p>Last Name: {user.lastName}</p>
             <button type='button' onClick={() => logout()}>Sign Out</button>
+            <Spendings />
         </div>
     );
 }
