@@ -1,13 +1,19 @@
 import { useState, useEffect } from "react";
 import useAxiosPrivate from "../hooks/useAxiosPrivate";
 import useAuth from "../hooks/useAuth";
+import useSpendings from "../hooks/useSpendings";
+import SpendingInfo from "./SpendingInfo";
+import SpendingInfoEditor from "./SpendingInfoEditor";
 
 const SPENDING_URL = '/spendings';
 
 const Spendings = () => {
     const {auth} = useAuth();
+    const {spendingInfos, setSpendingInfos} = useSpendings();
+    const [doUpdate, setDoUpdate] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
-    const [spendingInfos, setSpendingInfos] = useState([]);
+    const [editorIsOpen, setEditorIsOpen] = useState(false);
+    const [selectedSpendingInfo, setSelectedSpendingInfo] = useState(null);
     const axiosPrivate = useAxiosPrivate();
 
     useEffect(() => {
@@ -18,7 +24,6 @@ const Spendings = () => {
                 const response = await axiosPrivate.get(SPENDING_URL + `/${auth.username}`, {
                     signal: controller.signal
                 });
-                console.log(response.data);
                 setSpendingInfos(response.data);
             }
             catch (err) {
@@ -34,7 +39,26 @@ const Spendings = () => {
         return () => {
             controller.abort();
         }
-    }, []);
+    }, [doUpdate]);
+
+    const openSpendingInfoEditor = spendingInfo => {
+        setSelectedSpendingInfo(spendingInfo);
+        setEditorIsOpen(true);
+    }
+
+    const deleteSpendingInfo = async id => {
+        // delete from database
+        try {
+            await axiosPrivate.delete(SPENDING_URL + `/${id}`);
+        }
+        catch (err) {
+            console.log(err);
+            return;
+        }
+
+        // let component know to re-pull data
+        setDoUpdate(prev => !prev);
+    }
 
     return (
         <>
@@ -42,13 +66,20 @@ const Spendings = () => {
                 <p>Is Loading</p>
             ) : (
                 <>
-                    <h2>Your Spending</h2>
-                    {spendingInfos?.length ? (
-                        <ul>
-                            {spendingInfos.map((spendingInfo, i) => <p key={i}>{`Name: ${spendingInfo.name} Amount: ${spendingInfo.amount}`}</p>)}
-                        </ul>
-                    ) : <p>No Spending Record</p>
-                }
+                    {editorIsOpen ? 
+                        <SpendingInfoEditor spendingInfo={selectedSpendingInfo} closeEditor={() => setEditorIsOpen(false)} doUpdate={() => setDoUpdate(prev => !prev)}/>
+                    : (
+                        <>
+                            <h2>Your Spending</h2>
+                            {spendingInfos?.length ? (
+                                <ul>
+                                    {spendingInfos.map((spendingInfo, i) => <SpendingInfo key={i} spendingInfo={spendingInfo} deleteInfo={() => deleteSpendingInfo(spendingInfo.spending_id)} openEditor={() => openSpendingInfoEditor(spendingInfo)} />)}
+                                </ul>
+                            ) : <p>No Spending Record</p>
+                            }
+                            <button onClick={() => openSpendingInfoEditor(null)}>Add Entry</button>
+                        </>
+                    )}
                 </>
             )}
         </>
