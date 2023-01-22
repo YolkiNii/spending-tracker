@@ -15,7 +15,7 @@ app.use(require('./middleware/credentials'));
 app.use(cors(require('./config/corsOptions')));
 
 // built-in middleware to handle urlencoded form data
-app.use(express.urlencoded({extended: false}));
+app.use(express.urlencoded({ extended: false }));
 
 // built-in middleware for json
 app.use(express.json());
@@ -35,15 +35,13 @@ app.use('/spendings', require('./routes/api/spendingsRouter'));
 
 // connect to DB
 db.connect((err) => {
-    if (err) 
-        console.log(err);
+  if (err) console.log(err);
 
-    console.log('Connected to DB');
-    
-    app.listen(PORT, (err) => {
-        if (err)
-            return console.log(err);
-    
-        console.log(`Server now listening on port: ${PORT}`);
-    });
+  console.log('Connected to DB');
+
+  app.listen(PORT, (err) => {
+    if (err) return console.log(err);
+
+    console.log(`Server now listening on port: ${PORT}`);
+  });
 });

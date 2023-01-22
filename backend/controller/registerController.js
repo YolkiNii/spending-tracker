@@ -12,26 +12,26 @@ New User:
 }
 */
 const handleNewUser = async (req, res) => {
-    const {email, firstName, lastName, username, password} = req.body;
-    // check if no fields are empty
-    if (!email || !firstName || !lastName || !username || !password)
-        return res.sendStatus(400).json({'message': 'All fields need to be filled.'});
+  const { email, firstName, lastName, username, password } = req.body;
+  // check if no fields are empty
+  if (!email || !firstName || !lastName || !username || !password)
+    return res
+      .sendStatus(400)
+      .json({ message: 'All fields need to be filled.' });
 
-    try {
-        // check if user already exists
-        const foundUser =  await Users.findUserByUsername(username);
+  try {
+    // check if user already exists
+    const foundUser = await Users.findUserByUsername(username);
 
-        if (foundUser)
-            return res.sendStatus(409);
+    if (foundUser) return res.sendStatus(409);
 
-        // hash password and record user
-        const hashPassword = await bcrypt.hash(password, 10);
-        await Users.addUser(firstName, lastName, email, username, hashPassword);
-        res.status(201).json({'success': `User: ${username} added`});
+    // hash password and record user
+    const hashPassword = await bcrypt.hash(password, 10);
+    await Users.addUser(firstName, lastName, email, username, hashPassword);
+    res.status(201).json({ success: `User: ${username} added` });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
 
-    } catch (err) {
-        res.status(500).json({'message': err.message});
-    }
-}
-
-module.exports = {handleNewUser};
+module.exports = { handleNewUser };
