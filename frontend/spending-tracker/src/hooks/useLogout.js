@@ -1,22 +1,21 @@
-import baseAPI from "../api/base";
-import useAuth from "./useAuth";
+import baseAPI from '../api/base';
+import useAuth from './useAuth';
 
 const useLogout = () => {
-    const { setAuth } = useAuth();
+  const { setAuth } = useAuth();
 
-    const logout = async () => {
-        setAuth({});
-        try {
-            const response = await baseAPI('/logout', {
-                withCredentials: true
-            });
-        }
-        catch (err) {
-            console.error(err);
-        }
+  const logout = async () => {
+    setAuth({});
+    try {
+      const response = await baseAPI('/logout', {
+        withCredentials: true
+      });
+    } catch (err) {
+      console.error(err);
     }
+  };
 
-    return logout;
-}
+  return logout;
+};
 
 export default useLogout;
