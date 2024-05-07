@@ -4,6 +4,8 @@ import useAuth from '../hooks/useAuth';
 import useSpendings from '../hooks/useSpendings';
 import SpendingInfo from './SpendingInfo';
 import SpendingInfoEditor from './SpendingInfoEditor';
+import { Container } from '@mui/material';
+import SpendingDataGrid from './SpendingDataGrid';
 
 const SPENDING_URL = '/spendings';
 
@@ -15,6 +17,18 @@ const Spendings = () => {
   const [editorIsOpen, setEditorIsOpen] = useState(false);
   const [selectedSpendingInfo, setSelectedSpendingInfo] = useState(null);
   const axiosPrivate = useAxiosPrivate();
+
+  const dbRows = spendingInfos.map((spendingInfo) => {
+    const dateParts = spendingInfo.spending_date.split('-');
+    const formattedDate =
+      dateParts[0] + '-' + dateParts[1] + '-' + dateParts[2].substr(0, 2);
+
+    return {
+      ...spendingInfo,
+      id: spendingInfo.spending_id,
+      spending_date: new Date(formattedDate)
+    };
+  });
 
   useEffect(() => {
     const controller = new AbortController();
@@ -73,28 +87,10 @@ const Spendings = () => {
               doUpdate={() => setDoUpdate((prev) => !prev)}
             />
           ) : (
-            <>
+            <Container maxWidth='lg'>
               <h2>Your Spending</h2>
-              {spendingInfos?.length ? (
-                <ul>
-                  {spendingInfos.map((spendingInfo, i) => (
-                    <SpendingInfo
-                      key={i}
-                      spendingInfo={spendingInfo}
-                      deleteInfo={() =>
-                        deleteSpendingInfo(spendingInfo.spending_id)
-                      }
-                      openEditor={() => openSpendingInfoEditor(spendingInfo)}
-                    />
-                  ))}
-                </ul>
-              ) : (
-                <p>No Spending Record</p>
-              )}
-              <button onClick={() => openSpendingInfoEditor(null)}>
-                Add Entry
-              </button>
-            </>
+              <SpendingDataGrid dbRows={dbRows} />
+            </Container>
           )}
         </>
       )}
