@@ -1,5 +1,5 @@
 // Source Code: https://mui.com/x/react-data-grid/editing/#full-featured-crud-component
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import Button from '@mui/material/Button';
 import AddIcon from '@mui/icons-material/Add';
 import EditIcon from '@mui/icons-material/Edit';
@@ -13,12 +13,16 @@ import {
   GridActionsCellItem,
   GridRowEditStopReasons
 } from '@mui/x-data-grid';
+import useAuth from '../hooks/useAuth';
+import useAxiosPrivate from '../hooks/useAxiosPrivate';
+
+const SPENDING_URL = '/spendings';
 
 function EditToolbar(props) {
-  const { setRows, setRowModesModel } = props;
+  const { rows, setRows, setRowModesModel } = props;
 
   const handleClick = () => {
-    const id = 0;
+    const id = rows[rows.length - 1].id + 1;
     setRows((oldRows) => [
       ...oldRows,
       { id, name: '', amount: '', isNew: true }
@@ -38,7 +42,9 @@ function EditToolbar(props) {
   );
 }
 
-export default function SpendingDataGrid({ dbRows }) {
+export default function SpendingDataGrid({ dbRows, doUpdate }) {
+  const { auth } = useAuth();
+  const axiosPrivate = useAxiosPrivate();
   const [rows, setRows] = useState([]);
   const [rowModesModel, setRowModesModel] = useState({});
   console.log('dbRows: ', dbRows);
@@ -46,6 +52,15 @@ export default function SpendingDataGrid({ dbRows }) {
   useEffect(() => {
     setRows([...dbRows]);
   }, [dbRows]);
+
+  const handleDeleteSpending = useCallback(async (id) => {
+    try {
+      await axiosPrivate.delete(SPENDING_URL + `/${id}`);
+    } catch (err) {
+      console.log(err);
+      return;
+    }
+  }, []);
 
   const handleRowEditStop = (params, event) => {
     if (params.reason === GridRowEditStopReasons.rowFocusOut) {
@@ -61,7 +76,13 @@ export default function SpendingDataGrid({ dbRows }) {
     setRowModesModel({ ...rowModesModel, [id]: { mode: GridRowModes.View } });
   };
 
-  const handleDeleteClick = (id) => () => {
+  const handleDeleteClick = (id) => async () => {
+    try {
+      await handleDeleteSpending(id);
+    } catch (err) {
+      console.log(err);
+      return;
+    }
     setRows(rows.filter((row) => row.id !== id));
   };
 
@@ -77,11 +98,47 @@ export default function SpendingDataGrid({ dbRows }) {
     }
   };
 
-  const processRowUpdate = (newRow) => {
-    const updatedRow = { ...newRow, isNew: false };
-    setRows(rows.map((row) => (row.id === newRow.id ? updatedRow : row)));
-    return updatedRow;
-  };
+  const processRowUpdate = useCallback(
+    async (newRow, oldRow) => {
+      const newSpendingInfo = {
+        name: newRow.name,
+        note: newRow.note,
+        amount: newRow.amount,
+        spendingDate: newRow.spending_date.toISOString().split('T')[0]
+      };
+
+      // Post or Put new edit
+      if (newRow.isNew) {
+        try {
+          await axiosPrivate.post(
+            SPENDING_URL + `/${auth.username}`,
+            JSON.stringify(newSpendingInfo)
+          );
+        } catch (err) {
+          console.err(err);
+          return;
+        }
+      } else {
+        try {
+          await axiosPrivate.put(
+            SPENDING_URL + `/${oldRow.spending_id}`,
+            JSON.stringify(newSpendingInfo)
+          );
+        } catch (err) {
+          console.err(err);
+          return;
+        }
+      }
+      const updatedRow = { ...newRow, isNew: false };
+      setRows(rows.map((row) => (row.id === newRow.id ? updatedRow : row)));
+      return updatedRow;
+    },
+    [rows]
+  );
+
+  const handleProcessRowUpdateError = useCallback((error) => {
+    console.log(error);
+  }, []);
 
   const handleRowModesModelChange = (newRowModesModel) => {
     setRowModesModel(newRowModesModel);
@@ -162,11 +219,12 @@ export default function SpendingDataGrid({ dbRows }) {
       onRowModesModelChange={handleRowModesModelChange}
       onRowEditStop={handleRowEditStop}
       processRowUpdate={processRowUpdate}
+      onProcessRowUpdateError={handleProcessRowUpdateError}
       slots={{
         toolbar: EditToolbar
       }}
       slotProps={{
-        toolbar: { setRows, setRowModesModel }
+        toolbar: { rows, setRows, setRowModesModel }
       }}
     />
   );

@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react';
 import useAxiosPrivate from '../hooks/useAxiosPrivate';
 import useAuth from '../hooks/useAuth';
 import useSpendings from '../hooks/useSpendings';
-import SpendingInfo from './SpendingInfo';
 import SpendingInfoEditor from './SpendingInfoEditor';
 import { Container } from '@mui/material';
 import SpendingDataGrid from './SpendingDataGrid';
@@ -87,9 +86,12 @@ const Spendings = () => {
               doUpdate={() => setDoUpdate((prev) => !prev)}
             />
           ) : (
-            <Container maxWidth='lg'>
+            <Container maxWidth='lg' sx={{ height: 600 }}>
               <h2>Your Spending</h2>
-              <SpendingDataGrid dbRows={dbRows} />
+              <SpendingDataGrid
+                dbRows={dbRows}
+                doUpdate={() => setDoUpdate((prev) => !prev)}
+              />
             </Container>
           )}
         </>
