@@ -17,17 +17,21 @@ const Spendings = () => {
   const [selectedSpendingInfo, setSelectedSpendingInfo] = useState(null);
   const axiosPrivate = useAxiosPrivate();
 
-  const dbRows = spendingInfos.map((spendingInfo) => {
-    const dateParts = spendingInfo.spending_date.split('-');
-    const formattedDate =
-      dateParts[0] + '-' + dateParts[1] + '-' + dateParts[2].substr(0, 2);
+  let dbRows = [];
 
-    return {
-      ...spendingInfo,
-      id: spendingInfo.spending_id,
-      spending_date: new Date(formattedDate)
-    };
-  });
+  if (spendingInfos) {
+    dbRows = spendingInfos.map((spendingInfo) => {
+      const dateParts = spendingInfo.spending_date.split('-');
+      const formattedDate =
+        dateParts[0] + '-' + dateParts[1] + '-' + dateParts[2].substr(0, 2);
+
+      return {
+        ...spendingInfo,
+        id: spendingInfo.spending_id,
+        spending_date: new Date(formattedDate)
+      };
+    });
+  }
 
   useEffect(() => {
     const controller = new AbortController();

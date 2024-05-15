@@ -22,7 +22,7 @@ function EditToolbar(props) {
   const { rows, setRows, setRowModesModel } = props;
 
   const handleClick = () => {
-    const id = rows[rows.length - 1].id + 1;
+    const id = rows.length > 0 ? rows[rows.length - 1].id + 1 : 0;
     setRows((oldRows) => [
       ...oldRows,
       { id, name: '', amount: '', isNew: true }
