@@ -1,18 +1,18 @@
 const express = require('express');
 const cors = require('cors');
 const cookieParser = require('cookie-parser');
-const verifyJWT = require('./middleware/verifyJWT');
-const db = require('./config/db');
+const verifyJWT = require('../middleware/verifyJWT');
+const db = require('../config/db');
 
 const app = express();
 const PORT = 3500;
 
 // Handle options credentials check - before CORS!
 // and fetch cookies credentials requirement
-app.use(require('./middleware/credentials'));
+app.use(require('../middleware/credentials'));
 
 // Cross Origin Resource Sharing
-app.use(cors(require('./config/corsOptions')));
+app.use(cors(require('../config/corsOptions')));
 
 // built-in middleware to handle urlencoded form data
 app.use(express.urlencoded({ extended: false }));

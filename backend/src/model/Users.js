@@ -1,5 +1,5 @@
 const mysql = require('mysql');
-const db = require('../config/db');
+const db = require('../../config/db');
 
 class Users {
   static async findUserByUsername(username) {
